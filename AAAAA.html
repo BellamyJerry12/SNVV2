@@ -1,0 +1,471 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Animation with Image Frame</title>
+    <meta charset="UTF-8">
+    <style>
+        html,
+        body {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+            background: url('https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/482604JTo/anh-mo-ta.png') no-repeat center center fixed;
+            background-size: cover;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        #image-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -30%);
+            z-index: 1;
+            border: 10px solid #f92672;
+            padding: 10px;
+            border-radius: 20px;
+            background-color: white;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #image-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+            border: 10px solid #f92672;
+            padding: 10px;
+            border-radius: 20px;
+            background-color: white;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #image-frame img {
+            max-width: 200px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin: 10px 0;
+        }
+
+        .avatar {
+            max-width: 150px;
+            border-radius: 50%;
+            border: 3px solid #f92672;
+        }
+
+        .cake {
+            max-width: 200px;
+        }
+
+        #birthday-message {
+            position: absolute;
+            top: 2%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            font-size: 36px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px #1e3f66, 0 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            line-height: 1.5;
+            animation: fadeIn 2s ease-out forwards;
+            opacity: 0;
+        }
+
+        #birthday-message .name {
+            font-size: 42px;
+            color: #ffea00;
+            text-shadow: 2px 2px 4px #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            #birthday-message {
+                font-size: 24px;
+                top: 3%;
+            }
+
+            #birthday-message .name {
+                font-size: 30px;
+            }
+
+            #image-frame {
+                transform: translate(-50%, -30%);
+                padding: 8px;
+                border-width: 6px;
+            }
+
+            #image-frame img {
+                max-width: 140px;
+            }
+
+            .avatar {
+                max-width: 100px;
+            }
+
+            .cake {
+                max-width: 140px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="pinkboard"></canvas>
+    <div id="birthday-message">
+        🎉 Chúc Mừng Sinh Nhật <br>
+        <span class="name">HỒ MINH THUỶ 🎂</span><br>
+        Chúc THUỶ luôn vui vẻ,<br>
+        <span class="highlight">xinh đẹp</span> và <span class="highlight">học giỏi</span>!
+    </div>
+
+    <!-- 🖼️ Khung ảnh nằm giữa màn hình -->
+    <div id="image-frame">
+        <img src="https://i.postimg.cc/PrJ91Mw9/z6575091920946-22b2b2a5a13072126831747a72441f48.jpg" alt="cake">
+        <img src="https://batterydown.vn/wp-content/uploads/2022/05/Tai-hinh-banh-sinh-nhat-dep-nhat-the-gioi-2022.jpg"
+            alt="avatar">
+    </div>
+
+    <script>
+        // Settings
+        var settings = {
+            particles: {
+                length: 750,
+                duration: 2.5,
+                velocity: 100,
+                effect: -0.25,
+                size: 30,
+            },
+        };
+
+        // Polyfill for requestAnimationFrame
+        (function () {
+            var lastTime = 0;
+            var vendors = ['ms', 'moz', 'webkit', 'o'];
+            for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+                window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame']
+                    || window[vendors[x] + 'CancelRequestAnimationFrame'];
+            }
+
+            if (!window.requestAnimationFrame)
+                window.requestAnimationFrame = function (callback) {
+                    var currTime = new Date().getTime();
+                    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                    var id = window.setTimeout(function () { callback(currTime + timeToCall); }, timeToCall);
+                    lastTime = currTime + timeToCall;
+                    return id;
+                };
+
+            if (!window.cancelAnimationFrame)
+                window.cancelAnimationFrame = function (id) {
+                    clearTimeout(id);
+                };
+        })();
+
+        // Fireworks effect
+        const fireCanvas = document.createElement("canvas");
+        fireCanvas.style.position = "absolute";
+        fireCanvas.style.top = "0";
+        fireCanvas.style.left = "0";
+        fireCanvas.style.width = "100%";
+        fireCanvas.style.height = "100%";
+        fireCanvas.style.zIndex = "2";
+        document.body.appendChild(fireCanvas);
+
+        const ctx = fireCanvas.getContext("2d");
+        let fireworks = [];
+
+        function resizeFireCanvas() {
+            fireCanvas.width = window.innerWidth;
+            fireCanvas.height = window.innerHeight;
+        }
+
+        window.addEventListener("resize", resizeFireCanvas);
+        resizeFireCanvas();
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function createFirework(x, y) {
+            const colors = ["#ff2d95", "#fcd000", "#00e0ff", "#a3ff12", "#ff6a00"];
+            let particles = [];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    radius: 4,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    angle: Math.random() * 2 * Math.PI,
+                    speed: Math.random() * 7 + 3,
+                    alpha: 1,
+                    decay: random(0.01, 0.03)
+                });
+            }
+            fireworks.push(particles);
+        }
+
+        function updateFireworks() {
+            ctx.clearRect(0, 0, fireCanvas.width, fireCanvas.height);
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                let particles = fireworks[i];
+                for (let j = particles.length - 1; j >= 0; j--) {
+                    let p = particles[j];
+                    p.x += Math.cos(p.angle) * p.speed;
+                    p.y += Math.sin(p.angle) * p.speed + 1; // gravity
+                    p.alpha -= p.decay;
+                    if (p.alpha <= 0) {
+                        particles.splice(j, 1);
+                        continue;
+                    }
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2, false);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                }
+                if (particles.length === 0) {
+                    fireworks.splice(i, 1);
+                }
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(updateFireworks);
+        }
+
+        // Trigger fireworks at intervals
+        setInterval(() => {
+            const x = Math.random() * fireCanvas.width * 0.8 + fireCanvas.width * 0.1;
+            const y = Math.random() * fireCanvas.height * 0.5 + fireCanvas.height * 0.1;
+            createFirework(x, y);
+        }, 1000); // every second
+
+        updateFireworks();
+
+        // Point class
+        function Point(x, y) {
+            this.x = x || 0;
+            this.y = y || 0;
+        }
+
+        Point.prototype.clone = function () {
+            return new Point(this.x, this.y);
+        };
+
+        Point.prototype.length = function (length) {
+            if (typeof length == 'undefined')
+                return Math.sqrt(this.x * this.x + this.y * this.y);
+            this.normalize();
+            this.x *= length;
+            this.y *= length;
+            return this;
+        };
+
+        Point.prototype.normalize = function () {
+            var length = this.length();
+            this.x /= length;
+            this.y /= length;
+            return this;
+        };
+
+        // Particle class
+        function Particle() {
+            this.position = new Point();
+            this.velocity = new Point();
+            this.acceleration = new Point();
+            this.age = 0;
+        }
+
+        Particle.prototype.initialize = function (x, y, dx, dy) {
+            this.position.x = x;
+            this.position.y = y;
+            this.velocity.x = dx;
+            this.velocity.y = dy;
+            this.acceleration.x = dx * settings.particles.effect;
+            this.acceleration.y = dy * settings.particles.effect;
+            this.age = 0;
+        };
+
+        Particle.prototype.update = function (deltaTime) {
+            this.position.x += this.velocity.x * deltaTime;
+            this.position.y += this.velocity.y * deltaTime;
+            this.velocity.x += this.acceleration.x * deltaTime;
+            this.velocity.y += this.acceleration.y * deltaTime;
+            this.age += deltaTime;
+        };
+
+        Particle.prototype.draw = function (context, image) {
+            function ease(t) {
+                return (--t) * t * t + 1;
+            }
+            var size = image.width * ease(this.age / settings.particles.duration);
+            context.globalAlpha = 1 - this.age / settings.particles.duration;
+            context.drawImage(image, this.position.x - size / 2, this.position.y - size / 2, size, size);
+        };
+
+        // ParticlePool class
+        function ParticlePool(length) {
+            this.particles = new Array(length);
+            for (var i = 0; i < this.particles.length; i++)
+                this.particles[i] = new Particle();
+            this.firstActive = 0;
+            this.firstFree = 0;
+            this.duration = settings.particles.duration;
+        }
+
+        ParticlePool.prototype.add = function (x, y, dx, dy) {
+            this.particles[this.firstFree].initialize(x, y, dx, dy);
+            this.firstFree++;
+            if (this.firstFree == this.particles.length) this.firstFree = 0;
+            if (this.firstActive == this.firstFree) {
+                this.firstActive++;
+                if (this.firstActive == this.particles.length) this.firstActive = 0;
+            }
+        };
+
+        ParticlePool.prototype.update = function (deltaTime) {
+            var i;
+            if (this.firstActive < this.firstFree) {
+                for (i = this.firstActive; i < this.firstFree; i++)
+                    this.particles[i].update(deltaTime);
+            } else {
+                for (i = this.firstActive; i < this.particles.length; i++)
+                    this.particles[i].update(deltaTime);
+                for (i = 0; i < this.firstFree; i++)
+                    this.particles[i].update(deltaTime);
+            }
+
+            while (this.particles[this.firstActive].age >= this.duration && this.firstActive != this.firstFree) {
+                this.firstActive++;
+                if (this.firstActive == this.particles.length) this.firstActive = 0;
+            }
+        };
+
+        ParticlePool.prototype.draw = function (context, image) {
+            var i;
+            if (this.firstActive < this.firstFree) {
+                for (i = this.firstActive; i < this.firstFree; i++)
+                    this.particles[i].draw(context, image);
+            } else {
+                for (i = this.firstActive; i < this.particles.length; i++)
+                    this.particles[i].draw(context, image);
+                for (i = 0; i < this.firstFree; i++)
+                    this.particles[i].draw(context, image);
+            }
+        };
+
+        // Main script
+        (function (canvas) {
+            var context = canvas.getContext('2d'),
+                particles = new ParticlePool(settings.particles.length),
+                particleRate = settings.particles.length / settings.particles.duration,
+                time;
+
+            function pointOnCake(t, layer = 0) {
+                const radiusX = 140;
+                const radiusY = 80;
+                const layerHeight = 25;
+                return new Point(
+                    radiusX * Math.cos(t),
+                    radiusY * Math.sin(t) + layer * layerHeight
+                );
+            }
+
+            var image = (function () {
+                var canvas = document.createElement('canvas'),
+                    context = canvas.getContext('2d');
+                canvas.width = settings.particles.size;
+                canvas.height = settings.particles.size;
+
+                function to(t) {
+                    var point = pointOnCake(t);
+                    point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
+                    point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
+                    return point;
+                }
+
+                context.beginPath();
+                var t = -Math.PI;
+                var point = to(t);
+                context.moveTo(point.x, point.y);
+                while (t < Math.PI) {
+                    t += 0.01;
+                    point = to(t);
+                    context.lineTo(point.x, point.y);
+                }
+                context.closePath();
+                context.fillStyle = "#f92672";
+                context.fill();
+
+                var img = new Image();
+                img.src = canvas.toDataURL();
+                return img;
+            })();
+
+            function render() {
+                var newTime = new Date().getTime() / 1000,
+                    deltaTime = newTime - (time || newTime);
+                time = newTime;
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                var amount = particleRate * deltaTime;
+                for (let layer = 0; layer < 3; layer++) {
+                    for (var i = 0; i < amount / 3; i++) {
+                        var pos = pointOnCake(Math.PI - 2 * Math.PI * Math.random(), layer);
+                        var dir = pos.clone().normalize();
+                        particles.add(
+                            canvas.width / 2 + pos.x,
+                            canvas.height / 2 - pos.y,
+                            dir.x * settings.particles.velocity,
+                            -dir.y * settings.particles.velocity
+                        );
+                    }
+                }
+
+                particles.update(deltaTime);
+                particles.draw(context, image);
+
+                requestAnimationFrame(render);
+            }
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            window.onresize = resize;
+
+            resize();
+            requestAnimationFrame(render);
+
+        })(document.getElementById('pinkboard'));
+    </script>
+</body>
+
+</html>
